@@ -1,0 +1,30 @@
+# Terraform state
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Terraform plans
+*.tfplan
+*.binary
+tfplan.json
+
+# Terraform working dirs
+.terraform/
+.terraform.lock.hcl
+
+# Conftest artifacts
+conftest-results.txt
+
+# Evidence bundles
+evidence/
+evidence-*.tar.gz
+*.tar.gz
+
+# Local environment files
+*.env
+*.local
+
+# OS junk
+.DS_Store
+Thumbs.db
