@@ -1,0 +1,7 @@
+{
+  "name": "hipaa",
+  "version": "1.0.0",
+  "description": "HIPAA compliance policies for S3 encryption, TLS enforcement, and versioning",
+  "authors": ["Kurtes"],
+  "license": "MIT"
+}

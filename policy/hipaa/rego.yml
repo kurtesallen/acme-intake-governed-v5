@@ -1,0 +1,4 @@
+packages:
+  - compliance.hipaa.s3_encryption
+  - compliance.hipaa.s3_tls
+  - compliance.hipaa.s3_versioning

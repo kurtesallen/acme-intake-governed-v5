@@ -44,15 +44,29 @@ jobs:
           sudo mv conftest /usr/local/bin/conftest
           conftest --version
 
+      - name: Install OPA for Rego unit tests
+        run: |
+          curl -L -o opa https://openpolicyagent.org/downloads/latest/opa_linux_amd64
+          chmod +x opa
+          sudo mv opa /usr/local/bin/opa
+          opa version
+
       - name: Terraform init
         working-directory: terraform/grc
         run: terraform init -input=false
+
+      - name: Terraform validate
+        working-directory: terraform/grc
+        run: terraform validate
 
       - name: Terraform plan (JSON)
         working-directory: terraform/grc
         run: |
           terraform plan -out tfplan.binary -input=false
           terraform show -json tfplan.binary > tfplan.json
+
+      - name: Run Rego unit tests
+        run: opa test policy/hipaa -v
 
       - name: Run HIPAA Rego policies with Conftest (JSON)
         working-directory: terraform/grc
@@ -87,6 +101,34 @@ jobs:
             --signing-algorithm RSASSA_PSS_SHA_256 \
             --output json > conftest-results.sig.json
 
+      - name: Generate machine-readable evidence (JSON)
+        working-directory: terraform/grc
+        run: |
+          ts="$(date -u +%Y%m%dT%H%M%SZ)"
+          cat <<EOF > evidence.json
+          {
+            "framework": "HIPAA Security Rule",
+            "controls": [
+              "164.312(a)(2)(iv)",
+              "164.312(e)(1)",
+              "164.308(a)(1)(ii)(D)"
+            ],
+            "artifacts": {
+              "terraform_plan": "tfplan.json",
+              "policy_results": "conftest-results.json"
+            },
+            "timestamp": "$ts"
+          }
+          EOF
+
+      - name: Upload JSON evidence artifacts to S3
+        if: always()
+        working-directory: terraform/grc
+        run: |
+          aws s3 cp tfplan.json "s3://${EVIDENCE_BUCKET}/grc-evidence/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/tfplan.json"
+          aws s3 cp conftest-results.json "s3://${EVIDENCE_BUCKET}/grc-evidence/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/conftest-results.json"
+          aws s3 cp evidence.json "s3://${EVIDENCE_BUCKET}/grc-evidence/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/evidence.json"
+
       - name: Build evidence bundle
         if: always()
         working-directory: terraform/grc
@@ -97,6 +139,7 @@ jobs:
           cp tfplan.sig.json evidence/
           cp conftest-results.json evidence/ || true
           cp conftest-results.sig.json evidence/ || true
+          cp evidence.json evidence/
           tar czf "evidence-${ts}.tar.gz" evidence
           echo "EVIDENCE_ARCHIVE=evidence-${ts}.tar.gz" >> $GITHUB_ENV
 
