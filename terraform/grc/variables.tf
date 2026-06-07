@@ -8,7 +8,3 @@ variable "environment" {
   description = "Environment name (dev, prod, etc.)"
 }
 
-variable "evidence_bucket_name" {
-  type        = string
-  description = "Name of the evidence vault bucket"
-}

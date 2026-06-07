@@ -1,3 +1,7 @@
+############################################
+# GitHub OIDC Provider
+############################################
+
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 
@@ -9,6 +13,10 @@ resource "aws_iam_openid_connect_provider" "github" {
     "6938fd4d98bab03faadb97b34396831e3780aea1"
   ]
 }
+
+############################################
+# IAM Role for GitHub GRC Gate
+############################################
 
 resource "aws_iam_role" "github_grc_role" {
   name = "acme-github-grc-role"
@@ -31,6 +39,10 @@ resource "aws_iam_role" "github_grc_role" {
   })
 }
 
+############################################
+# IAM Policy for GitHub GRC Gate
+############################################
+
 resource "aws_iam_role_policy" "github_grc_policy" {
   role = aws_iam_role.github_grc_role.id
 
@@ -52,7 +64,7 @@ resource "aws_iam_role_policy" "github_grc_policy" {
           "s3:PutObject",
           "s3:GetObject"
         ]
-        Resource = "${aws_s3_bucket.evidence_vault.arn}/*"
+        Resource = "${data.aws_s3_bucket.evidence_vault.arn}/*"
       },
       {
         Effect = "Allow"

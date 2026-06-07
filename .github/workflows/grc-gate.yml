@@ -72,12 +72,12 @@ jobs:
         working-directory: terraform/grc
         run: |
           set -o pipefail
-          conftest test --policy ../../policy/hipaa --output json tfplan.json | tee conftest-results.json
+          conftest test tfplan.json -p ../../conftest/test --output json | tee conftest-results.json
 
       - name: Fail if Conftest found violations
         working-directory: terraform/grc
         run: |
-          conftest test --policy ../../policy/hipaa tfplan.json >/dev/null
+          conftest test tfplan.json -p ../../conftest/test >/dev/null
 
       - name: Sign Terraform plan with KMS (SHA-256 digest)
         working-directory: terraform/grc

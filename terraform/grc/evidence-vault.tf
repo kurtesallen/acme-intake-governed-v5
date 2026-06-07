@@ -1,40 +1,25 @@
-resource "aws_s3_bucket" "evidence_vault" {
-  bucket = "acme-evidence-vault-${random_id.suffix.hex}"
+############################################
+# Evidence Vault Bucket (SAFE, IMMUTABLE)
+############################################
 
-  object_lock_enabled = true
+# IMPORTANT:
+# This bucket ALREADY EXISTS and contains v4 evidence.
+# Terraform must NOT create or destroy it.
+# We declare it as a data source instead of a resource.
 
-  tags = {
-    Purpose = "audit-evidence"
-    ManagedBy = "terraform"
-  }
+data "aws_s3_bucket" "evidence_vault" {
+  bucket = "acme-evidence-vault-c1aa6b62"
 }
 
-resource "aws_s3_bucket_versioning" "evidence_vault_versioning" {
-  bucket = aws_s3_bucket.evidence_vault.id
+# Versioning, SSE, Object Lock, and Public Access Block
+# are ALREADY configured on the bucket.
+# Terraform must NOT manage them anymore.
 
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
+# These are intentionally removed to prevent deletion:
+# - aws_s3_bucket.evidence_vault
+# - aws_s3_bucket_versioning.evidence_vault_versioning
+# - aws_s3_bucket_server_side_encryption_configuration.evidence_vault_sse
+# - aws_s3_bucket_object_lock_configuration.evidence_vault_lock
+# - aws_s3_bucket_public_access_block.evidence_vault_block
 
-resource "aws_s3_bucket_object_lock_configuration" "evidence_vault_lock" {
-  bucket = aws_s3_bucket.evidence_vault.id
-
-  rule {
-    default_retention {
-      mode = "COMPLIANCE"
-      days = 365
-    }
-  }
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "evidence_vault_sse" {
-  bucket = aws_s3_bucket.evidence_vault.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.phi_cmk.arn
-      sse_algorithm     = "aws:kms"
-    }
-  }
-}
+# Terraform will ONLY manage the bucket policy in cloudtrail-bucket-policy.tf
