@@ -231,11 +231,3 @@ This repository implements a **complete governed CI/CD pipeline** with:
 This system is **production‑grade**, **auditor‑ready**, and aligned with **real enterprise GRC engineering patterns**.
 
 ---
-
-If you want, I can now generate:
-
-- A **one‑page executive summary**  
-- A **slide deck outline**  
-- A **LinkedIn announcement post**  
-
-Just tell me which one you want next.
