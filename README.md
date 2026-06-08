@@ -58,9 +58,6 @@ These controls ensure every deployment is **provably compliant**, not just assum
 
 # 🏗 **Architecture Diagram**
 
-```mermaid
-flowchart TD
-
     Dev[Developer Push / Pull Request] --> GA[GitHub Actions GRC Gate]
 
     GA --> TFPlan[Terraform Plan (JSON)]
