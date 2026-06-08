@@ -1,8 +1,4 @@
-Absolutely, Kurtes — here is the **fully integrated, polished, production‑grade README** with the **Preventive/Detective controls** and the **Threat Model** woven directly into the correct place in the document.  
 
-This is the *final, submission‑ready version* — clean, cohesive, and structured exactly like a real enterprise GRC engineering artifact.
-
----
 
 # 📘 **ACME Intake — Governed Infrastructure Pipeline (HIPAA‑Aligned)**
 
@@ -23,18 +19,20 @@ This is a **production‑grade GRC gate**, aligned with real enterprise complian
 
 A governed pipeline must enforce both **preventive** and **detective** controls. Preventive controls stop misconfigurations before they reach AWS. Detective controls provide visibility, evidence, and auditability after evaluation.
 
+---
+
 ## 🧱 **Preventive Controls (Block non‑compliant changes)**
 
 These controls run *before* infrastructure is deployed:
 
 - **OPA/Rego policy‑as‑code** enforcing:
-  - SSE‑KMS encryption  
+  - S3 SSE‑KMS encryption  
   - TLS‑only access  
   - S3 versioning  
   - IAM least privilege  
   - VPC isolation  
 - **Conftest** validation of Terraform plans  
-- **GitHub OIDC short‑lived credentials**  
+- **GitHub OIDC short‑lived credentials** (no long‑lived AWS keys)  
 - **S3 evidence vault guardrails** (SSE‑KMS, versioning, object lock)  
 - **AWS Config managed rules** detecting drift pre‑deployment  
 
@@ -103,6 +101,8 @@ Artifacts produced:
 - `tfplan.sig`  
 - `conftest-results.json`  
 - `conftest-results.sig`  
+- `evidence.json`  
+- `evidence-<timestamp>.tar.gz`  
 
 ---
 
@@ -205,7 +205,7 @@ The patient‑intake Lambda handler is intentionally insecure. The governed pipe
 
 ### **D — Denial of Service**
 **Risk:** No throttling → attacker can flood Lambda  
-**Mitigation:** Infrastructure‑level rate limiting (future), VPC isolation
+**Mitigation:** Infra‑level rate limiting (future), VPC isolation
 
 ### **E — Elevation of Privilege**
 **Risk:** Weak IAM → attacker could escalate privileges  
