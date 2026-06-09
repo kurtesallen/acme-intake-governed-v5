@@ -35,7 +35,6 @@ jobs:
           role-to-assume: ${{ env.GRC_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: grc-gate-session
-
       - name: Debug identity
         run: aws sts get-caller-identity
 
