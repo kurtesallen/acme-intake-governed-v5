@@ -29,15 +29,17 @@ jobs:
         with:
           terraform_version: 1.5.7
 
+
+      - name: Debug identity
+        run: aws sts get-caller-identity
+
       - name: Configure AWS credentials (GitHub OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.GRC_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: grc-gate-session
-      - name: Debug identity
-        run: aws sts get-caller-identity
-
+      
 
       - name: Install Conftest 0.45.0
         run: |
