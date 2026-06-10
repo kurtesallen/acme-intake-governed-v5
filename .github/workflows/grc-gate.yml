@@ -34,9 +34,7 @@ jobs:
           echo "${ACTIONS_ID_TOKEN_REQUEST_URL}"
           echo "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
 
-      - name: Debug identity
-        run: aws sts get-caller-identity
-
+      
       - name: Configure AWS credentials (GitHub OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -45,7 +43,9 @@ jobs:
           role-session-name: grc-gate-session
           audience: sts.amazonaws.com
       
-            
+      - name: Debug identity
+        run: aws sts get-caller-identity
+     
 
       - name: Install Conftest 0.45.0
         run: |
