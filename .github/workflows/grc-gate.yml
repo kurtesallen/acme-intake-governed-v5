@@ -28,7 +28,11 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.7
-
+          
+      - name: Print GitHub OIDC token claims
+        run: |
+          echo "${ACTIONS_ID_TOKEN_REQUEST_URL}"
+          echo "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
 
       - name: Debug identity
         run: aws sts get-caller-identity
