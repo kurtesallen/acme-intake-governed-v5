@@ -43,7 +43,9 @@ jobs:
           role-to-assume: ${{ env.GRC_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: grc-gate-session
+          audience: sts.amazonaws.com
       
+            
 
       - name: Install Conftest 0.45.0
         run: |
