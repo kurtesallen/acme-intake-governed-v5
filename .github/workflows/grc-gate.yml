@@ -16,6 +16,11 @@ jobs:
     name: HIPAA GRC Gate
     runs-on: ubuntu-latest
 
+    # Only allow OIDC when:
+    # - push event, OR
+    # - PR from same repo (not a fork)
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+
     permissions:
       id-token: write
       contents: read
@@ -28,13 +33,12 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.7
-          
+
       - name: Print GitHub OIDC token claims
         run: |
-          echo "${ACTIONS_ID_TOKEN_REQUEST_URL}"
-          echo "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
+          echo "OIDC URL: ${ACTIONS_ID_TOKEN_REQUEST_URL}"
+          echo "OIDC TOKEN: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
 
-      
       - name: Configure AWS credentials (GitHub OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -42,10 +46,9 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: grc-gate-session
           audience: sts.amazonaws.com
-      
+
       - name: Debug identity
         run: aws sts get-caller-identity
-     
 
       - name: Install Conftest 0.45.0
         run: |
@@ -55,8 +58,6 @@ jobs:
           tar -xzf /tmp/conftest-install/conftest.tar.gz -C /tmp/conftest-install
           sudo mv /tmp/conftest-install/conftest /usr/local/bin/conftest
           conftest --version
-
-
 
       - name: Install OPA for Rego unit tests
         run: |
