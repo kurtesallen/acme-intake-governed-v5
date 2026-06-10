@@ -16,11 +16,6 @@ jobs:
     name: HIPAA GRC Gate
     runs-on: ubuntu-latest
 
-    # Only allow OIDC when:
-    # - push event, OR
-    # - PR from same repo (not a fork)
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
-
     permissions:
       id-token: write
       contents: read
@@ -39,13 +34,29 @@ jobs:
           echo "OIDC URL: ${ACTIONS_ID_TOKEN_REQUEST_URL}"
           echo "OIDC TOKEN: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
 
-      - name: Configure AWS credentials (GitHub OIDC)
+      ############################################################
+      # HYBRID AUTH: Try OIDC first, fall back to static creds
+      ############################################################
+
+      - name: Try OIDC authentication
+        id: oidc
+        continue-on-error: true
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.GRC_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
           role-session-name: grc-gate-session
           audience: sts.amazonaws.com
+
+      - name: Fallback to static AWS credentials if OIDC failed
+        if: steps.oidc.outcome == 'failure'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      ############################################################
 
       - name: Debug identity
         run: aws sts get-caller-identity
