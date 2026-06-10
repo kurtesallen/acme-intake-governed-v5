@@ -1,4 +1,4 @@
-name: GRC Gate
+name: GRC Gates
 
 on:
   pull_request:
