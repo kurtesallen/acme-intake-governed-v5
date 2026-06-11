@@ -1,0 +1,13 @@
+{
+  "framework": "HIPAA Security Rule",
+  "controls": [
+    "164.312(a)(2)(iv)",
+    "164.312(e)(1)",
+    "164.308(a)(1)(ii)(D)"
+  ],
+  "artifacts": {
+    "terraform_plan": "tfplan.json",
+    "policy_results": "conftest-results.json"
+  },
+  "timestamp": "20260611T194443Z"
+}
