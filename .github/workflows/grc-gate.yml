@@ -74,10 +74,11 @@ jobs:
 
       - name: Install OPA for Rego unit tests
         run: |
-          curl -L -o opa https://openpolicyagent.org/downloads/latest/opa_linux_amd64
+          curl -L -o opa https://openpolicyagent.org/downloads/v0.63.0/opa_linux_amd64
           chmod +x opa
           sudo mv opa /usr/local/bin/opa
           opa version
+
 
       ############################################################
       # TERRAFORM (WORKAROUND APPLIED)
