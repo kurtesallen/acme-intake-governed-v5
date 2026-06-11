@@ -87,6 +87,16 @@ resource "aws_iam_role_policy" "github_grc_policy" {
           "sts:AssumeRole"
         ]
         Resource = "*"
+      },
+      {
+        Sid    = "TerraformStateLock"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem"
+        ]
+        Resource = "arn:aws:dynamodb:us-east-1:846470648858:table/acme-terraform-locks"
       }
     ]
   })
