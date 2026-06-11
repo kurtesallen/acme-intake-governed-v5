@@ -23,19 +23,34 @@ resource "aws_iam_role" "github_grc_role" {
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Federated = aws_iam_openid_connect_provider.github.arn
-      }
-      Action = "sts:AssumeRoleWithWebIdentity"
-      Condition = {
-        StringEquals = {
-          "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-          "token.actions.githubusercontent.com:sub" = "repo:kurtesallen/acme-intake-governed-v4:*"
+    Statement = [
+      # --- GitHub OIDC trust ---
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.github.arn
         }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+            "token.actions.githubusercontent.com:sub" = "repo:kurtesallen/acme-intake-governed-v5:*"
+          }
+        }
+      },
+
+      # --- Static IAM user fallback trust (with TagSession) ---
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::846470648858:user/kurt"
+        }
+        Action = [
+          "sts:AssumeRole",
+          "sts:TagSession"
+        ]
       }
-    }]
+    ]
   })
 }
 
