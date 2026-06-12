@@ -79,10 +79,6 @@ jobs:
           sudo mv opa /usr/local/bin/opa
           opa version
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 47f39250e82b0a4a61dc069365a947d29848d993
       ############################################################
       # TERRAFORM (WORKAROUND APPLIED)
       ############################################################
@@ -98,21 +94,14 @@ jobs:
       - name: Terraform plan (JSON)
         working-directory: terraform/grc
         run: |
-<<<<<<< HEAD
-          terraform plan -out tfplan.binary -input=false -refresh=false -lock=false
+          terraform plan \
+            -out tfplan.binary \
+            -input=false \
+            -refresh=false \
+            -lock=false \
+            -var="region=us-east-1" \
+            -var="environment=dev"
           terraform show -json tfplan.binary > tfplan.json
-=======
-            terraform plan \
-              -out tfplan.binary \
-              -input=false \
-              -refresh=false \
-              -lock=false \
-              -var="region=us-east-1" \
-              -var="environment=dev"
-            terraform show -json tfplan.binary > tfplan.json
-
-      ############################################################
->>>>>>> 47f39250e82b0a4a61dc069365a947d29848d993
 
       ############################################################
 
@@ -172,6 +161,58 @@ jobs:
           }
           EOF
 
+      - name: Generate OSCAL evidence (Assessment Results)
+        working-directory: terraform/grc
+        run: |
+          ts="$(date -u +%Y%m%dT%H%M%SZ)"
+          cat <<EOF > evidence.oscal.json
+          {
+            "assessment-results": {
+              "uuid": "$(uuidgen)",
+              "metadata": {
+                "title": "HIPAA Compliance Evidence",
+                "last-modified": "$ts",
+                "version": "1.0.0",
+                "oscal-version": "1.1.2"
+              },
+              "results": [
+                {
+                  "uuid": "$(uuidgen)",
+                  "title": "Terraform + Rego Compliance Evaluation",
+                  "description": "Automated evaluation of IaC controls using Terraform plan and Rego policies.",
+                  "start": "$ts",
+                  "end": "$ts",
+                  "observations": [
+                    {
+                      "uuid": "$(uuidgen)",
+                      "description": "Terraform plan evaluated against HIPAA controls.",
+                      "props": [
+                        { "name": "artifact", "value": "tfplan.json" }
+                      ]
+                    },
+                    {
+                      "uuid": "$(uuidgen)",
+                      "description": "Rego policy evaluation results.",
+                      "props": [
+                        { "name": "artifact", "value": "conftest-results.json" }
+                      ]
+                    }
+                  ],
+                  "control-selections": [
+                    {
+                      "controls": [
+                        "164.312(a)(2)(iv)",
+                        "164.312(e)(1)",
+                        "164.308(a)(1)(ii)(D)"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+          EOF
+
       - name: Upload JSON evidence artifacts to S3
         if: always()
         working-directory: terraform/grc
@@ -179,6 +220,7 @@ jobs:
           aws s3 cp tfplan.json "s3://${EVIDENCE_BUCKET}/grc-evidence/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/tfplan.json"
           aws s3 cp conftest-results.json "s3://${EVIDENCE_BUCKET}/grc-evidence/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/conftest-results.json"
           aws s3 cp evidence.json "s3://${EVIDENCE_BUCKET}/grc-evidence/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/evidence.json"
+          aws s3 cp evidence.oscal.json "s3://${EVIDENCE_BUCKET}/grc-evidence/${GITHUB_REPOSITORY}/${GITHUB_RUN_ID}/evidence.oscal.json"
 
       - name: Build evidence bundle
         if: always()
@@ -191,6 +233,7 @@ jobs:
           cp conftest-results.json evidence/ || true
           cp conftest-results.sig.json evidence/ || true
           cp evidence.json evidence/
+          cp evidence.oscal.json evidence/
           tar czf "evidence-${ts}.tar.gz" evidence
           echo "EVIDENCE_ARCHIVE=evidence-${ts}.tar.gz" >> $GITHUB_ENV
 
