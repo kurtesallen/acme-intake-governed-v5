@@ -87,11 +87,11 @@ resource "aws_config_configuration_recorder" "recorder" {
 ############################################
 
 resource "aws_config_delivery_channel" "channel" {
-  name            = "default"
-  s3_bucket_name  = data.aws_s3_bucket.evidence_vault.bucket
-  s3_key_prefix   = "config"
-  s3_kms_key_arn  = aws_kms_key.phi_cmk.arn
-  sns_topic_arn   = null
+  name           = "default"
+  s3_bucket_name = data.aws_s3_bucket.evidence_vault.bucket
+  s3_key_prefix  = "config"
+  s3_kms_key_arn = aws_kms_key.phi_cmk.arn
+  sns_topic_arn  = null
 
   depends_on = [
     aws_config_configuration_recorder.recorder
