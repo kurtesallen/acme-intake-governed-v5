@@ -36,3 +36,6 @@ Thumbs.db
 # Node / build junk (if any future UI)
 node_modules/
 dist/
+
+# GRC evidence artifacts (never commit)
+evidence/
