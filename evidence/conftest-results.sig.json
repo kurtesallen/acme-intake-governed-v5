@@ -1,5 +1,0 @@
-{
-    "KeyId": "arn:aws:kms:us-east-1:846470648858:key/d92522bb-2f8a-4cd4-b2a1-d833414842a3",
-    "Signature": "ROVaSjoCEBX05IFzxGkawJJY7gNj/qxZGnXxBhlRL/C0rHhQBozqRvJHUewro2v80r0ROd+eShDqlypNbZJFVTGU6RNuS7rRQXVtUmMVk1l3uTPIlfBpWSJgPyjLbszykDGL3z/5FyTWLm938sPnW0it3H09fZnEEplydzqMb8WmKAN75f56D/ZFy+9hqn6x0NDipmqHKeNd0Guvi3nrjZVleu6jVZSvOPN6nup2SLQTySF6hYoe5sRkMw57xnY6h/0/EcDRuxF2J7PgQAcKCZqQbKTsh73wqw/g0Vmki0Vntmice4ZUblNmIBkGgqoCu8/b8FFaUlKyNRNW+IeqFw==",
-    "SigningAlgorithm": "RSASSA_PSS_SHA_256"
-}
